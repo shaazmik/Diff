@@ -1,0 +1,149 @@
+digraph structs {
+8197360 [shape=record];
+8197360 [style=filled,color="blue"];
+8197360 [label="*"]
+"8197360" -> "8197744";
+8197744 [shape=record];
+8197744 [style=diagonals,color="green"];
+8197744 [label="^"]
+
+8197744 [shape=record];
+8197744 [style=filled,color="blue"];
+8197744 [label="^"]
+"8197744" -> "8197792";
+8197792 [shape=diamond];
+8197792 [style=filled,color="hotpink"];
+8197792 [label="e"]
+
+8197792 [shape=diamond];
+8197792 [style=filled,color="hotpink"];
+8197792 [label="e"]
+"8197744" -> "8197840";
+8197840 [shape=record];
+8197840 [style=diagonals,color="green"];
+8197840 [label="+"]
+
+8197840 [shape=record];
+8197840 [style=filled,color="blue"];
+8197840 [label="+"]
+"8197840" -> "8197888";
+8197888 [shape=record];
+8197888 [style=diagonals,color="green"];
+8197888 [label="^"]
+
+8197888 [shape=record];
+8197888 [style=filled,color="blue"];
+8197888 [label="^"]
+"8197888" -> "8197936";
+8197936 [shape=diamond];
+8197936 [style=filled,color="hotpink"];
+8197936 [label="x"]
+
+8197936 [shape=diamond];
+8197936 [style=filled,color="hotpink"];
+8197936 [label="x"]
+"8197888" -> "8197984";
+8197984 [shape=oval];
+8197984 [style=filled,color="red"];
+8197984 [label="2"]
+
+8197984 [shape=oval];
+8197984 [style=filled,color="red"];
+8197984 [label="2"]
+"8197840" -> "8219280";
+8219280 [shape=oval];
+8219280 [style=filled,color="red"];
+8219280 [label="5"]
+
+8219280 [shape=oval];
+8219280 [style=filled,color="red"];
+8219280 [label="5"]
+"8197360" -> "8197616";
+8197616 [shape=record];
+8197616 [style=diagonals,color="green"];
+8197616 [label="+"]
+
+8197616 [shape=record];
+8197616 [style=filled,color="blue"];
+8197616 [label="+"]
+"8197616" -> "8197488";
+8197488 [shape=record];
+8197488 [style=diagonals,color="green"];
+8197488 [label="*"]
+
+8197488 [shape=record];
+8197488 [style=filled,color="blue"];
+8197488 [label="*"]
+"8197488" -> "8197440";
+8197440 [shape=record];
+8197440 [style=diagonals,color="green"];
+8197440 [label="*"]
+
+8197440 [shape=record];
+8197440 [style=filled,color="blue"];
+8197440 [label="*"]
+"8197440" -> "8220048";
+8220048 [shape=record];
+8220048 [style=diagonals,color="green"];
+8220048 [label="^"]
+
+8220048 [shape=record];
+8220048 [style=filled,color="blue"];
+8220048 [label="^"]
+"8220048" -> "8220144";
+8220144 [shape=diamond];
+8220144 [style=filled,color="hotpink"];
+8220144 [label="x"]
+
+8220144 [shape=diamond];
+8220144 [style=filled,color="hotpink"];
+8220144 [label="x"]
+"8220048" -> "8219568";
+8219568 [shape=record];
+8219568 [style=diagonals,color="green"];
+8219568 [label="-"]
+
+8219568 [shape=record];
+8219568 [style=filled,color="blue"];
+8219568 [label="-"]
+"8219568" -> "8219376";
+8219376 [shape=oval];
+8219376 [style=filled,color="red"];
+8219376 [label="2"]
+
+8219376 [shape=oval];
+8219376 [style=filled,color="red"];
+8219376 [label="2"]
+"8219568" -> "8219712";
+8219712 [shape=oval];
+8219712 [style=filled,color="red"];
+8219712 [label="1"]
+
+8219712 [shape=oval];
+8219712 [style=filled,color="red"];
+8219712 [label="1"]
+"8197440" -> "8219520";
+8219520 [shape=oval];
+8219520 [style=filled,color="red"];
+8219520 [label="1"]
+
+8219520 [shape=oval];
+8219520 [style=filled,color="red"];
+8219520 [label="1"]
+"8197488" -> "8197568";
+8197568 [shape=oval];
+8197568 [style=filled,color="red"];
+8197568 [label="2"]
+
+8197568 [shape=oval];
+8197568 [style=filled,color="red"];
+8197568 [label="2"]
+"8197616" -> "8197696";
+8197696 [shape=oval];
+8197696 [style=filled,color="red"];
+8197696 [label="0"]
+
+8197696 [shape=oval];
+8197696 [style=filled,color="red"];
+8197696 [label="0"]
+}
