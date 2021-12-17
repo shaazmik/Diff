@@ -5,6 +5,7 @@
 #include ".\recursive_descent.h"
 
 char* s; 
+struct Pnode* dump = nullptr;
 
 int main()
 {
@@ -31,6 +32,10 @@ int main()
     tree.start_node = getG(tree.start_node);
 
     diff_cases(tree.start_node);
+    
+    dump = tree.start_node;
+
+    yes_i_am_simp(tree.start_node);
 
     graph(tree.start_node);
 

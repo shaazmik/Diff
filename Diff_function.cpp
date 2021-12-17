@@ -4,6 +4,8 @@
 #include ".\Diff.h"
 #include ".\recursive_descent.h"
 
+extern struct Pnode* dump;
+
 int ptree_construct(struct Ptree* tree)
 {
     assert(tree != nullptr);
@@ -15,9 +17,16 @@ int ptree_construct(struct Ptree* tree)
     return 1;
 }
 
-struct Pnode** pnode_constructor(struct Pnode** node,int value)
+void add_pnode(struct Pnode** node)
 {
+    *node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
+    (*node)->right = nullptr;
+    (*node)->left  = nullptr;
+    (*node)->value = Poison;
+    (*node)->type  = Poison;
+
+    return;
 }
 
 
@@ -26,6 +35,15 @@ void pnode_destructor(struct Pnode **node)
 
     if (*node == nullptr)
         return;
+    
+    if ((*node)->left != nullptr)
+    {
+        pnode_destructor(&(*node)->left);
+    }
+    if (&(*node)->left)
+    {
+        pnode_destructor(&(*node)->right);
+    }
 
     (*node)->right = nullptr;
     (*node)->left  = nullptr;
@@ -497,6 +515,7 @@ struct Pnode* copy_part_tree(struct Pnode* node)
         copied_node->type  = node->type;
         copied_node->left  = copy_part_tree(node->left);
         copied_node->right = copy_part_tree(node->right);
+        return copied_node;
     }
     else return nullptr;
 
@@ -509,13 +528,11 @@ void copy_pnode(struct Pnode** dst, struct Pnode* src)
 
     if (*dst == nullptr)
     {
-
+        add_pnode(dst);
     }
 
     (*dst)->type  = src->type;
     (*dst)->value = src->value;
-
-    if (src->left != nullptr)
     
     if (src->left != nullptr)
     {
@@ -527,140 +544,146 @@ void copy_pnode(struct Pnode** dst, struct Pnode* src)
         copy_pnode(&(*dst)->right, src->right);
     }
 
+
     return;
 }
 
 
-void simplify(Pnode **node) 
+void simplify_node(Pnode* node) 
 {
 
-    assert (*node != nullptr);
+    if (node != nullptr)
+        return;
 
-    if ((*node)->type == OPERATOR) 
+    if (node->type == OPERATOR) 
     {
-        switch ((*node)->value) 
+        switch (node->value) 
         {
 
             case '*': 
 
-                if ((*node)->right->value == 1) 
+                if (node->right->value == 1) 
                 {
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->left);
+                    copy_pnode(&tmp, node->left);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    tmp = copy_part_tree(node);
                 }
-                else if ((*node)->left->value == 1) 
+                else if (node->left->value == 1) 
                 {
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->right);
+                    copy_pnode(&tmp, node->right);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
-                else if ((*node)->right->value == 0 || (*node)->left->value == 0) 
+                else if (node->right->value == 0 || node->left->value == 0) 
                 {
-                    pnode_destructor(node);
-                    ctor (node, 0);
-                    (*node)->type = NUMBER;
-                    (*node)->value = 0;
+                    pnode_destructor(&node);
+
+                    add_pnode(&node);
+
+                    node->type = NUMBER;
+                    node->value = 0;
                 }
-                else if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
+                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
                 {
                     
                     struct Pnode* tmp = nullptr;
-                    ctor (&tmp, 0);
+                    
+                    add_pnode(&tmp);
                     tmp->type = NUMBER;
-                    tmp->value = (*node)->left->value * (*node)->right->value;
+                    tmp->value = node->left->value * node->right->value;
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
             break;
 
             case '+':
 
-                if ((*node)->right->value == 0) 
+                if (node->right->value == 0) 
+                {
+                    struct Pnode* tmp = node->left;
+                    node->left = nullptr;
+                    pnode_destructor(&node);
+                    node = tmp;
+                }
+                else if (node->left->value == 0) 
                 {
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->left);
+                    copy_pnode(&tmp, node->right);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
-                else if ((*node)->left->value == 0) 
-                {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->right);
-
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
-                }
-                else if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
+                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
                 {
                     
                     struct Pnode* tmp = nullptr;
-                    ctor (&tmp, 0);
-                    tmp->type = NUMBER;
-                    tmp->value = (*node)->left->value + (*node)->right->value;
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    add_pnode(&tmp);
+                    tmp->type = NUMBER;
+                    tmp->value = node->left->value + node->right->value;
+
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
             break;
 
             case '-':
 
-                if ((*node)->right->value == 0) 
+                if (node->right->value == 0) 
                 {
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->left);
+                    copy_pnode(&tmp, node->left);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
-                else if ((*node)->left->value == 0) 
+                else if (node->left->value == 0) 
                 {
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->right);
+                    copy_pnode(&tmp, node->right);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
-                else if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
+                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
                 {
                     
                     struct Pnode* tmp = nullptr;
-                    ctor (&tmp, 0);
-                    tmp->type = NUMBER;
-                    tmp->value = (*node)->left->value - (*node)->right->value;
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    add_pnode(&tmp);
+                    tmp->type = NUMBER;
+                    tmp->value = node->left->value - node->right->value;
+
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
             break;
 
             case '^':
 
-                if ((*node)->right->value == 1) 
+                if (node->right->value == 1) 
                 {
                     
                     struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, (*node)->left);
+                    copy_pnode(&tmp, node->left);
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
-                else if ((*node)->right->value == 0) 
+                else if (node->right->value == 0) 
                 {
                     struct Pnode* tmp = nullptr;
-                    ctor (&tmp, 0);
+                    add_pnode(&tmp);
                     tmp->type = NUMBER;
                     tmp->value = 0;
 
-                    pnode_destructor(node);
-                    copy_pnode(node, tmp);
+                    pnode_destructor(&node);
+                    copy_pnode(&node, tmp);
                 }
                 
             break;
@@ -671,8 +694,34 @@ void simplify(Pnode **node)
     return;
 }
 
+void yes_i_am_simp(struct Pnode* start_node)
+{
+    assert(start_node != nullptr);
+
+    if (start_node->left != nullptr)
+    {
+        yes_i_am_simp(start_node->left);
+    }
+
+    if (start_node->right != nullptr)
+    {
+        yes_i_am_simp(start_node->right);
+    }
+
+    graph(dump);
+
+    simplify_node(start_node);
+
+    graph(dump);
+
+    return;
+}
+
 void graph(struct Pnode* start_node) 
 {
+    static int dump_number = 1;
+
+    char cmd[100] = "0";
 
     assert(start_node != nullptr);
 
@@ -688,9 +737,14 @@ void graph(struct Pnode* start_node)
 
     fclose (out);
 
-    system ("dot -Tpng demo.txt -o graph.png");
+    snprintf(cmd, sizeof(cmd), "dot -Tpng demo.txt -o graph_%d.png", dump_number);
+    system (cmd);
+   
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "graph_%d.png", dump_number);
+    system (cmd);
 
-    system ("graph.png");
+    dump_number++;
 
     return;
 }

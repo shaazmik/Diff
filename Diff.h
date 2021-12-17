@@ -7,7 +7,7 @@
 #include <assert.h>
 
 
-
+const size_t Poison = 'otrava';
 
 struct Pnode
 {
@@ -15,9 +15,9 @@ struct Pnode
 
     Pnode* right  = nullptr;
 
-    size_t type   = 0;
+    size_t type   = Poison;
 
-    int    value  = 0;
+    int    value  = Poison;
 };
 
 
@@ -48,7 +48,7 @@ int ptree_construct(struct Ptree* tree);
 void pnode_destructor(struct Pnode **node);
 
 
-struct Pnode** pnode_constructor(struct Pnode** node,int value);
+void add_pnode(struct Pnode** node);
 
 
 void diff_cases(struct Pnode* node);
@@ -81,7 +81,10 @@ struct Pnode* copy_part_tree(struct Pnode* node);
 void copy_pnode(struct Pnode** dst, struct Pnode* src);
 
 
-void simplify(Pnode** node); 
+void simplify_node(Pnode** node); 
+
+
+void yes_i_am_simp(struct Pnode* start_node);
 
 
 void graph(Pnode* head);
