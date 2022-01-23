@@ -1,1 +1,1 @@
-# ** differentiator **
+# Differentiator
