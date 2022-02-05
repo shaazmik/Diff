@@ -10,5 +10,8 @@ ____
 ## Short manual
 
 ____
-- input your 
+- compile the all .cpp files
+- input your equation in open.txt
+- launch the exe file and get the result
+- also if you have got ***Graphviz package and Tex language*** , then you get graph_1.png with graph and tex file with equation.
 ____
