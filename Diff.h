@@ -7,7 +7,7 @@
 #include <assert.h>
 
 
-const size_t Poison = 'otrava';
+const size_t Poison = 14899;
 
 struct Pnode
 {
@@ -46,6 +46,9 @@ int ptree_construct(struct Ptree* tree);
 
 
 void pnode_destructor(struct Pnode **node);
+
+
+void ptree_destructor(Pnode** topNode);
 
 
 void add_pnode(struct Pnode** node);
@@ -87,7 +90,13 @@ void simplify_node(Pnode** node);
 void yes_i_am_simp(struct Pnode* start_node);
 
 
-void graph(Pnode* head);
+void tex_dump_node(struct Pnode* node, FILE *tex);
+
+
+void tex_dump(struct Pnode* start_node, struct Pnode* diff_node); 
+
+
+void graph(struct Pnode* head);
 
 
 static void in_order_graph(Pnode *node, FILE* out);

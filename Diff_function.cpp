@@ -4,7 +4,6 @@
 #include ".\Diff.h"
 #include ".\recursive_descent.h"
 
-extern struct Pnode* dump;
 
 int ptree_construct(struct Ptree* tree)
 {
@@ -36,15 +35,6 @@ void pnode_destructor(struct Pnode **node)
     if (*node == nullptr)
         return;
     
-    if ((*node)->left != nullptr)
-    {
-        pnode_destructor(&(*node)->left);
-    }
-    if (&(*node)->left)
-    {
-        pnode_destructor(&(*node)->right);
-    }
-
     (*node)->right = nullptr;
     (*node)->left  = nullptr;
 
@@ -390,10 +380,10 @@ struct Pnode* diff_power_e(struct Pnode* node)
     return node;
 }
 
-struct Pnode* diff_ln(struct Pnode* node)
-{
+// struct Pnode* diff_ln(struct Pnode* node)
+// {
 
-}
+// }
 
 struct Pnode* diff_cos(struct Pnode* node)
 {
@@ -500,8 +490,6 @@ struct Pnode* diff_sin(struct Pnode* node)
     node->left->right  = new_node_left_right;
 
     return node;
-
-
 }
 
 struct Pnode* copy_part_tree(struct Pnode* node)
@@ -544,150 +532,214 @@ void copy_pnode(struct Pnode** dst, struct Pnode* src)
         copy_pnode(&(*dst)->right, src->right);
     }
 
-
     return;
 }
 
+void ptree_destructor(Pnode** topNode) 
+{
+    assert (topNode);
 
-void simplify_node(Pnode* node) 
+   // free (topNode->data);
+
+    if (&(*topNode)->left == nullptr) 
+    {
+        return;
+    }
+
+    ptree_destructor(&(*topNode)->left);
+
+    free ((*topNode)->left);
+
+    if (&(*topNode)->right != nullptr) 
+    {
+        ptree_destructor(&(*topNode)->right);
+
+        free ((*topNode)->right);
+    }
+}
+
+
+void simplify_node(Pnode** node) 
 {
 
-    if (node != nullptr)
-        return;
+    assert(node != nullptr);
 
-    if (node->type == OPERATOR) 
+    if ((*node)->type == OPERATOR) 
     {
-        switch (node->value) 
+        switch ((*node)->value) 
         {
 
             case '*': 
 
-                if (node->right->value == 1) 
+                if ((*node)->right->value == 1) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->left);
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode (&tmp, (*node)->left);
 
-                    pnode_destructor(&node);
-                    tmp = copy_part_tree(node);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
-                else if (node->left->value == 1) 
+                else if ((*node)->left->value == 1) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->right);
-
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
-                }
-                else if (node->right->value == 0 || node->left->value == 0) 
-                {
-                    pnode_destructor(&node);
-
-                    add_pnode(&node);
-
-                    node->type = NUMBER;
-                    node->value = 0;
-                }
-                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
-                {
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode (&tmp, (*node)->right);
                     
-                    struct Pnode* tmp = nullptr;
-                    
-                    add_pnode(&tmp);
-                    tmp->type = NUMBER;
-                    tmp->value = node->left->value * node->right->value;
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
+                else if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
+                {
+                    int val = (*node)->left->value * (*node)->right->value;
+
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+                    (*node)->value = val;
+                    (*node)->type  = NUMBER;
+                }
+                else if ((*node)->right->value == 0 || (*node)->left->value == 0) 
+                {
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    (*node)->type = NUMBER;
+                    (*node)->value = 0;
+                }
+
             break;
 
             case '+':
-
-                if (node->right->value == 0) 
+            {   if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
                 {
-                    struct Pnode* tmp = node->left;
-                    node->left = nullptr;
-                    pnode_destructor(&node);
-                    node = tmp;
+                    (*node)->type = NUMBER;
+                    (*node)->value = (*node)->left->value + (*node)->right->value;
+
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    //copy_pnode(node, tmp);
                 }
-                else if (node->left->value == 0) 
+                else if ((*node)->right->value == 0) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->right);
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode(&tmp, (*node)->left);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
-                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
+                else if ((*node)->left->value == 0) 
                 {
-                    
-                    struct Pnode* tmp = nullptr;
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode(&tmp, (*node)->right);
 
-                    add_pnode(&tmp);
-                    tmp->type = NUMBER;
-                    tmp->value = node->left->value + node->right->value;
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
+
             break;
+            }
 
             case '-':
-
-                if (node->right->value == 0) 
+                if ((*node)->right->type == NUMBER && (*node)->left->type == NUMBER) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->left);
+                    (*node)->type = NUMBER;
+                    (*node)->value = (*node)->left->value - (*node)->right->value;
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
                 }
-                else if (node->left->value == 0) 
+                else if ((*node)->right->value == 0) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->right);
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode(&tmp, (*node)->left);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
-                else if (node->right->type == NUMBER && node->left->type == NUMBER) 
+                else if ((*node)->left->value == 0) 
                 {
-                    
-                    struct Pnode* tmp = nullptr;
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode(&tmp, (*node)->right);
 
-                    add_pnode(&tmp);
-                    tmp->type = NUMBER;
-                    tmp->value = node->left->value - node->right->value;
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
             break;
+            
 
             case '^':
+            {
 
-                if (node->right->value == 1) 
+                if ((*node)->right->value == 1) 
                 {
-                    
-                    struct Pnode* tmp = nullptr;
-                    copy_pnode(&tmp, node->left);
+                    struct Pnode* tmp = (struct Pnode *)calloc (1, sizeof (struct Pnode));
+                    copy_pnode(&tmp, (*node)->left);
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
+
+                    copy_pnode(node, tmp);
                 }
-                else if (node->right->value == 0) 
+                else if ((*node)->right->value == 0) 
                 {
-                    struct Pnode* tmp = nullptr;
-                    add_pnode(&tmp);
-                    tmp->type = NUMBER;
-                    tmp->value = 0;
+                    (*node)->type = NUMBER;
+                    (*node)->value = 1;
 
-                    pnode_destructor(&node);
-                    copy_pnode(&node, tmp);
+                    ptree_destructor(&(*node)->left);
+                    ptree_destructor(&(*node)->right);
+
+                    (*node)->left = nullptr;
+                    (*node)->right = nullptr;
                 }
-                
+            
             break;
+            }
             default:
+                printf("yes you are simpy dimpy\n");
             break;
         }
     }
@@ -708,11 +760,212 @@ void yes_i_am_simp(struct Pnode* start_node)
         yes_i_am_simp(start_node->right);
     }
 
-    graph(dump);
+    //graph(dump);
 
-    simplify_node(start_node);
+    simplify_node(&start_node);
 
-    graph(dump);
+    //graph(dump);
+
+    return;
+}
+
+void tex_dump(struct Pnode* start_node, struct Pnode* diff_node) 
+{
+    assert(start_node);
+    assert(diff_node);
+
+    FILE *tex = fopen ("Result.tex", "w");
+
+    fprintf (tex,   "\\documentclass{article}\n"
+                    "\\usepackage[russian]{babel}\n"
+                    "\\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}\n"
+                    "\\usepackage{amsmath}\n"
+                    "\\usepackage{graphicx}\n"
+                    "\\usepackage[colorlinks=true, allcolors=blue]{hyperref}\n"
+                    "\\title{Жопа с ручкой}\n"
+                    "\\author{Парамонов Парамон}\n"
+                    "\\begin{document}\n"
+                    "\\maketitle\n"
+                    "\\begin{abstract}\n"
+                    "Вдохновлялся преподавателем с практическим опытом...\n"
+                    "\\end{abstract}\n"
+                    "\\section{Интегрирование:)}\n");
+
+    fprintf (tex, "\\[f(x) = ");
+    tex_dump_node(start_node, tex);
+    fprintf (tex, "\\]\n");
+
+    fprintf (tex, "\\[(f(x))' = ");
+    tex_dump_node(diff_node, tex);
+    fprintf (tex, "\\]\n");
+
+    fprintf (tex, "\\end{document}\n");
+
+    fclose (tex);
+}
+
+void tex_dump_node(Pnode* node, FILE *tex) 
+{
+    assert (node);
+    assert (tex);
+
+    switch (node->type) 
+    {
+        case NUMBER: 
+        {
+            fprintf (tex, "{%d}", node->value);
+
+            break;
+        }
+        case OPERATOR: 
+        {
+            switch (node->value) 
+            {
+                case '*': 
+                {
+                    if (node->left->type == OPERATOR && ((node->left->value == '-') || (node->left->value == '+'))) 
+                    {
+                        fprintf (tex, "(");
+
+                        tex_dump_node(node->left, tex);
+
+                        fprintf (tex, ")");
+                    }
+                    else 
+                    {
+                        tex_dump_node(node->left, tex);
+                    }
+
+                    fprintf (tex, " \\cdot ");
+
+                    if (node->right->type == OPERATOR &&  ((node->right->value == '-') || (node->right->value == '+'))) 
+                    {
+                        fprintf (tex, "(");
+
+                        tex_dump_node(node->right, tex);
+
+                        fprintf (tex, ")");
+                    }
+                    else 
+                    {
+                       tex_dump_node(node->right, tex);
+                    }
+
+                    break;
+                }
+                case '/': 
+                {
+                    fprintf (tex, "\\frac{");
+
+                    if (node->left->type == OPERATOR && ((node->left->value == '-') || (node->left->value == '+'))) 
+                    {
+                            fprintf (tex, "(");
+
+                            tex_dump_node(node->left, tex);
+
+                            fprintf (tex, ")");
+                    }
+                    else 
+                    {
+                         tex_dump_node(node->left, tex);
+                    }
+
+                    fprintf (tex, "}{");
+
+                    if (node->right->type == OPERATOR && ((node->right->value == '-') || (node->right->value == '+'))) 
+                    {
+                        fprintf (tex, "(");
+
+                        tex_dump_node(node->right, tex);
+
+                        fprintf (tex, ")");
+                    }
+                    else 
+                    {
+                        tex_dump_node(node->right, tex);
+                    }
+
+                    fprintf (tex, "}");
+
+                    break;
+                }
+                case '^': 
+                {
+                    if (node->left->type != NUMBER && node->left->type != VARIABLE) 
+                    {
+                        fprintf (tex, "({");
+
+                        tex_dump_node(node->left, tex);
+
+                        fprintf (tex, "})");
+                    }
+                    else 
+                    {
+                        tex_dump_node(node->left, tex);
+                    }
+
+                    fprintf (tex, "%s", "^");
+
+                    fprintf (tex, "{");
+
+                    tex_dump_node(node->right, tex);
+
+                    fprintf (tex, "}");
+
+                    break;
+                }
+                case '+': 
+                {
+                    tex_dump_node(node->left, tex);
+
+                    fprintf (tex, "%c", node->value);
+
+                    tex_dump_node(node->right, tex);
+
+                    break;
+                }
+            }
+
+            break;
+        }
+        case VARIABLE: 
+        {
+            fprintf (tex, "{%c}", node->value);
+
+            break;
+        }
+        case FUNCTION_NAME: 
+        {
+            if (node->left->value == 'c')
+            {
+                fprintf(tex, "\\cos", node->left->value);
+            }
+            else if (node->left->value == 's')
+            {
+                fprintf(tex, "\\sin", node->left->value);
+
+            }
+            else
+            {
+                fprintf(tex, "\\ln", node->left->value);
+            }
+
+            if (node->right->type != NUMBER && node->right->type != VARIABLE) 
+            {
+                fprintf (tex, "{");
+
+                tex_dump_node(node->right, tex);
+
+                fprintf (tex, "}");
+            }
+            else 
+            {
+                tex_dump_node(node->right, tex);
+            }
+
+            break;
+        }
+    }
 
     return;
 }
@@ -740,9 +993,9 @@ void graph(struct Pnode* start_node)
     snprintf(cmd, sizeof(cmd), "dot -Tpng demo.txt -o graph_%d.png", dump_number);
     system (cmd);
    
-    memset(cmd, 0, sizeof(cmd));
-    snprintf(cmd, sizeof(cmd), "graph_%d.png", dump_number);
-    system (cmd);
+    // memset(cmd, 0, sizeof(cmd));
+    // snprintf(cmd, sizeof(cmd), "graph_%d.png", dump_number);
+    // system (cmd);
 
     dump_number++;
 
@@ -752,46 +1005,42 @@ void graph(struct Pnode* start_node)
 
 static void in_order_graph(Pnode *node, FILE* out) 
 {
-    
-    assert (node != nullptr);
-    assert (out  != nullptr);
-
-        if (node->type == NUMBER) 
-        {
-            fprintf (out, "%d [shape=oval];\n", node);
-            fprintf (out, "%d [style=filled,color=\"red\"];\n", node);
-            fprintf (out, "%d [label=\"%d\"]\n", node, node->value);
-        }
-        else if (node->type == OPERATOR) 
-        {
-            fprintf (out, "%d [shape=record];\n", node);
-            fprintf (out, "%d [style=filled,color=\"blue\"];\n", node);
-            fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
-        }
-        else if (node->type == VARIABLE) 
-        {
-            fprintf (out, "%d [shape=diamond];\n", node);
-            fprintf (out, "%d [style=filled,color=\"hotpink\"];\n", node);
-            fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
-        }
-        else if (node->type == FUNCTION_NAME) 
-        {
-            fprintf (out, "%d [shape=star];\n", node);
-            fprintf (out, "%d [style=filled,color=\"Sienna\"];\n", node);
-            fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
-        }
-        else if (node->type == FUNCTION_MATH)
-        {
-            fprintf (out, "%d [shape=star];\n", node);
-            fprintf (out, "%d [style=filled,color=\"cyan4\"];\n", node);
-            fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
-        }
-        else 
-        {
-            fprintf (out, "%d [shape=oval];\n", node);
-            fprintf (out, "%d [style=filled,color=\"hotpink\"];\n", node);
-            fprintf (out, "%d [label=\"%c\"]\n", node, node->value); 
-        }
+    if (node->type == NUMBER) 
+    {
+        fprintf (out, "%d [shape=oval];\n", node);
+        fprintf (out, "%d [style=filled,color=\"red\"];\n", node);
+        fprintf (out, "%d [label=\"%d\"]\n", node, node->value);
+    }
+    else if (node->type == OPERATOR) 
+    {
+        fprintf (out, "%d [shape=record];\n", node);
+        fprintf (out, "%d [style=filled,color=\"blue\"];\n", node);
+        fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
+    }
+    else if (node->type == VARIABLE) 
+    {
+        fprintf (out, "%d [shape=diamond];\n", node);
+        fprintf (out, "%d [style=filled,color=\"hotpink\"];\n", node);
+        fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
+    }
+    else if (node->type == FUNCTION_NAME) 
+    {
+        fprintf (out, "%d [shape=star];\n", node);
+        fprintf (out, "%d [style=filled,color=\"Sienna\"];\n", node);
+        fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
+    }
+    else if (node->type == FUNCTION_MATH)
+    {
+        fprintf (out, "%d [shape=star];\n", node);
+        fprintf (out, "%d [style=filled,color=\"cyan4\"];\n", node);
+        fprintf (out, "%d [label=\"%c\"]\n", node, node->value);
+    }
+    else 
+    {
+        fprintf (out, "%d [shape=oval];\n", node);
+        fprintf (out, "%d [style=filled,color=\"hotpink\"];\n", node);
+        fprintf (out, "%d [label=\"%c\"]\n", node, node->value); 
+    }
 
     if (node->left != nullptr) 
     {

@@ -16,19 +16,19 @@ char* get_math_word(char* s);
 
 struct Pnode* input_operator(struct Pnode* node, char oper);
 
-struct Pnode* getG(struct Pnode* node);
+struct Pnode* getLast(struct Pnode* node);
 
-struct Pnode* getE(struct Pnode* node);
+struct Pnode* getSumSub(struct Pnode* node);
 
-struct Pnode* getT(struct Pnode* node);
+struct Pnode* getMultDiv(struct Pnode* node);
 
 struct Pnode* getPw(struct Pnode* node);
 
-struct Pnode* getP(struct Pnode* node);
+struct Pnode* getPair(struct Pnode* node);
 
 struct Pnode* get_math_F(struct Pnode* node);
 
-struct Pnode* getV(struct Pnode* node);
+struct Pnode* getVar(struct Pnode* node);
 
 struct Pnode* getN(struct Pnode* node);
 

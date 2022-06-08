@@ -1,53 +1,69 @@
 digraph structs {
-7345392 [shape=record];
-7345392 [style=filled,color="blue"];
-7345392 [label="+"]
-"7345392" -> "7345344";
-7345344 [shape=record];
-7345344 [style=diagonals,color="green"];
-7345344 [label="*"]
+2036976 [shape=record];
+2036976 [style=filled,color="blue"];
+2036976 [label="*"]
+"2036976" -> "2062512";
+2062512 [shape=oval];
+2062512 [style=filled,color="red"];
+2062512 [label="3"]
 
-7345344 [shape=record];
-7345344 [style=filled,color="blue"];
-7345344 [label="*"]
-"7345344" -> "7345520";
-7345520 [shape=oval];
-7345520 [style=filled,color="red"];
-7345520 [label="0"]
+2062512 [shape=oval];
+2062512 [style=filled,color="red"];
+2062512 [label="3"]
+"2036976" -> "2062224";
+2062224 [shape=record];
+2062224 [style=diagonals,color="green"];
+2062224 [label="*"]
 
-7345520 [shape=oval];
-7345520 [style=filled,color="red"];
-7345520 [label="0"]
-"7345344" -> "7345568";
-7345568 [shape=diamond];
-7345568 [style=filled,color="hotpink"];
-7345568 [label="x"]
+2062224 [shape=record];
+2062224 [style=filled,color="blue"];
+2062224 [label="*"]
+"2062224" -> "2062464";
+2062464 [shape=star];
+2062464 [style=dashed,color="Sienna"];
+2062464 [label="F"]
 
-7345568 [shape=diamond];
-7345568 [style=filled,color="hotpink"];
-7345568 [label="x"]
-"7345392" -> "7345472";
-7345472 [shape=record];
-7345472 [style=diagonals,color="green"];
-7345472 [label="*"]
+2062464 [shape=star];
+2062464 [style=filled,color="Sienna"];
+2062464 [label="F"]
+"2062464" -> "2061264";
+2061264 [shape=star];
+2061264 [style=filled,color="cyan4"];
+2061264 [label="c"]
 
-7345472 [shape=record];
-7345472 [style=filled,color="blue"];
-7345472 [label="*"]
-"7345472" -> "7345616";
-7345616 [shape=oval];
-7345616 [style=filled,color="red"];
-7345616 [label="0"]
+2061264 [shape=star];
+2061264 [style=filled,color="cyan4"];
+2061264 [label="c"]
+"2062464" -> "2061552";
+2061552 [shape=record];
+2061552 [style=diagonals,color="green"];
+2061552 [label="*"]
 
-7345616 [shape=oval];
-7345616 [style=filled,color="red"];
-7345616 [label="0"]
-"7345472" -> "7345664";
-7345664 [shape=oval];
-7345664 [style=filled,color="red"];
-7345664 [label="1"]
+2061552 [shape=record];
+2061552 [style=filled,color="blue"];
+2061552 [label="*"]
+"2061552" -> "2062128";
+2062128 [shape=oval];
+2062128 [style=filled,color="red"];
+2062128 [label="5"]
 
-7345664 [shape=oval];
-7345664 [style=filled,color="red"];
-7345664 [label="1"]
+2062128 [shape=oval];
+2062128 [style=filled,color="red"];
+2062128 [label="5"]
+"2061552" -> "2061792";
+2061792 [shape=diamond];
+2061792 [style=filled,color="hotpink"];
+2061792 [label="x"]
+
+2061792 [shape=diamond];
+2061792 [style=filled,color="hotpink"];
+2061792 [label="x"]
+"2062224" -> "2062032";
+2062032 [shape=oval];
+2062032 [style=filled,color="red"];
+2062032 [label="5"]
+
+2062032 [shape=oval];
+2062032 [style=filled,color="red"];
+2062032 [label="5"]
 }

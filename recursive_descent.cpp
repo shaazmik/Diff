@@ -10,7 +10,7 @@
 
 
 
-extern char* s;
+extern char* input_buffer;
 
 
 
@@ -52,11 +52,11 @@ char* fill_text(FILE* in, size_t file_size)
 }
 
 
-char* get_math_word(char* s)
+char* get_math_word(char* input_buffer)
 {
     char* math_f = (char*)calloc(Math_function_len, sizeof(char));
 
-    strncpy(math_f, s, Math_function_len);
+    strncpy(math_f, input_buffer, Math_function_len);
 
     math_f[Math_function_len - 1] = '\0';
 
@@ -82,11 +82,11 @@ struct Pnode* input_operator(struct Pnode* node, char oper)
     return node;
 }
 
-struct Pnode* getG(struct Pnode* node)
+struct Pnode* getLast(struct Pnode* node)
 {
-    struct Pnode* main_node = getE(node);
+    struct Pnode* main_node = getSumSub(node);
 
-    if (*s == '$')
+    if (*input_buffer== '$')
     {
         return main_node;
     }
@@ -95,19 +95,19 @@ struct Pnode* getG(struct Pnode* node)
 }
 
 
-struct Pnode* getE(struct Pnode* node)
+struct Pnode* getSumSub(struct Pnode* node)
 {
-    struct Pnode* left_node = getT(node);
+    struct Pnode* left_node = getMultDiv(node);
 
-    if (*s == '+')
+    if (*input_buffer== '+')
     {
-        s++;
+        input_buffer++;
 
         struct Pnode* father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
         father_node->left  = left_node;
 
-        struct Pnode* right_node  = getT(node);
+        struct Pnode* right_node  = getMultDiv(node);
 
         father_node->right = right_node;
 
@@ -116,7 +116,7 @@ struct Pnode* getE(struct Pnode* node)
         father_node->value = '+';
 
 
-        if (*s == '+')
+        if (*input_buffer == '+')
         {
             struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -128,15 +128,15 @@ struct Pnode* getE(struct Pnode* node)
 
             assert(mega_father_node != nullptr);
 
-            s++;
+            input_buffer++;
 
-            mega_father_node->right = getE(node);
+            mega_father_node->right = getSumSub(node);
 
             return mega_father_node;
         }
         else
         {
-            if (*s == '-')
+            if (*input_buffer == '-')
             {
                 struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -148,9 +148,9 @@ struct Pnode* getE(struct Pnode* node)
 
                 assert(mega_father_node != nullptr);
 
-                s++;
+                input_buffer++;
 
-                mega_father_node->right = getE(node);
+                mega_father_node->right = getSumSub(node);
 
                 return mega_father_node;
             }
@@ -160,15 +160,15 @@ struct Pnode* getE(struct Pnode* node)
     } 
     else
     {
-        if (*s == '-')
+        if (*input_buffer == '-')
         {
-            s++;
+            input_buffer++;
 
             struct Pnode* father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
             father_node->left  = left_node;
 
-            struct Pnode* right_node  = getT(node);
+            struct Pnode* right_node  = getMultDiv(node);
 
             father_node->right = right_node;
 
@@ -176,7 +176,7 @@ struct Pnode* getE(struct Pnode* node)
 
             father_node->value = '-';
 
-            if (*s == '-')
+            if (*input_buffer == '-')
             {
                 struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -188,15 +188,15 @@ struct Pnode* getE(struct Pnode* node)
 
                 assert(mega_father_node != nullptr);
 
-                s++;
+                input_buffer++;
 
-                mega_father_node->right = getE(node);
+                mega_father_node->right = getSumSub(node);
 
                 return mega_father_node;
             }
             else
             {
-                if (*s == '+')
+                if (*input_buffer == '+')
                 {
                     struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -208,9 +208,9 @@ struct Pnode* getE(struct Pnode* node)
 
                     assert(mega_father_node != nullptr);
 
-                    s++;
+                    input_buffer++;
 
-                    mega_father_node->right = getE(node);
+                    mega_father_node->right = getSumSub(node);
 
                     return mega_father_node;
                 }
@@ -225,13 +225,13 @@ struct Pnode* getE(struct Pnode* node)
     }
 }
 
-struct Pnode* getT(struct Pnode* node)
+struct Pnode* getMultDiv(struct Pnode* node)
 {
     struct Pnode* left_node   = getPw(node);
 
-    if (*s == '*')
+    if (*input_buffer == '*')
     {
-        s++;
+        input_buffer++;
 
         struct Pnode* father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -245,7 +245,7 @@ struct Pnode* getT(struct Pnode* node)
 
         father_node->value = '*';
 
-        if (*s == '*')
+        if (*input_buffer == '*')
         {
             struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -257,15 +257,15 @@ struct Pnode* getT(struct Pnode* node)
 
             assert(mega_father_node != nullptr);
 
-            s++;
+            input_buffer++;
 
-            mega_father_node->right = getT(node);
+            mega_father_node->right = getMultDiv(node);
 
             return mega_father_node;
         }
         else
         {
-            if (*s == '/')
+            if (*input_buffer == '/')
             {
                 struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -277,9 +277,9 @@ struct Pnode* getT(struct Pnode* node)
 
                 assert(mega_father_node != nullptr);
 
-                s++;
+                input_buffer++;
 
-                mega_father_node->right = getT(node);
+                mega_father_node->right = getMultDiv(node);
 
                 return mega_father_node;
             }
@@ -289,9 +289,9 @@ struct Pnode* getT(struct Pnode* node)
     } 
     else
     {
-        if (*s == '/')
+        if (*input_buffer == '/')
         {
-            s++;
+            input_buffer++;
 
             struct Pnode* father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -305,7 +305,7 @@ struct Pnode* getT(struct Pnode* node)
 
             father_node->value = '/';
 
-            if (*s == '/')
+            if (*input_buffer == '/')
             {
                 struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -317,15 +317,15 @@ struct Pnode* getT(struct Pnode* node)
 
                 assert(mega_father_node != nullptr);
 
-                s++;
+                input_buffer++;
 
-                mega_father_node->right = getT(node);
+                mega_father_node->right = getMultDiv(node);
 
                 return mega_father_node;
             }
             else
             {
-                if (*s == '*')
+                if (*input_buffer == '*')
                 {
                     struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -337,9 +337,9 @@ struct Pnode* getT(struct Pnode* node)
 
                     assert(mega_father_node != nullptr);
 
-                    s++;
+                    input_buffer++;
 
-                    mega_father_node->right = getT(node);
+                    mega_father_node->right = getMultDiv(node);
 
                     return mega_father_node;
                 }
@@ -357,17 +357,17 @@ struct Pnode* getT(struct Pnode* node)
 
 struct Pnode* getPw(struct Pnode* node)
 {
-    struct Pnode* left_node = getP(node);
+    struct Pnode* left_node = getPair(node);
 
-    if (*s == '^')
+    if (*input_buffer == '^')
     {
-        s++;
+        input_buffer++;
 
         struct Pnode* father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
         father_node->left  = left_node;
 
-        struct Pnode* right_node  = getP(node);
+        struct Pnode* right_node  = getPair(node);
 
         father_node->right = right_node;
 
@@ -375,7 +375,7 @@ struct Pnode* getPw(struct Pnode* node)
 
         father_node->value = '^';
 
-        if (*s == '^')
+        if (*input_buffer == '^')
         {
             struct Pnode* mega_father_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
@@ -387,7 +387,7 @@ struct Pnode* getPw(struct Pnode* node)
 
             assert(mega_father_node != nullptr);
 
-            s++;
+            input_buffer++;
 
             mega_father_node->right = getPw(node);
 
@@ -402,21 +402,21 @@ struct Pnode* getPw(struct Pnode* node)
     }
 }
 
-struct Pnode* getP(struct Pnode* node)
+struct Pnode* getPair(struct Pnode* node)
 {
-    if (*s == '(')
+    if (*input_buffer == '(')
     {
-        s++;
+        input_buffer++;
 
-        struct Pnode* new_node = getE(node);
+        struct Pnode* new_node = getSumSub(node);
 
-        if (*s != ')')
+        if (*input_buffer != ')')
         {
             SYNTAX_ERROR;
         }
         else
         {
-            s++;
+            input_buffer++;
             
             return new_node;
         }
@@ -427,13 +427,13 @@ struct Pnode* getP(struct Pnode* node)
 
 struct Pnode* get_math_F(struct Pnode* node)
 {
-    char* math_func = get_math_word(s);
+    char* math_func = get_math_word(input_buffer);
 
     if (math_func != nullptr)
     {
         struct Pnode* func_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
-        s+= 3;
+        input_buffer+= 3;
 
         func_node->value = 'F';
         func_node->type  = FUNCTION_NAME;
@@ -448,17 +448,17 @@ struct Pnode* get_math_F(struct Pnode* node)
             func_node->left->value = 'c';
         }
         func_node->left->type   = FUNCTION_MATH;
-        func_node->right        = getP(node);
+        func_node->right        = getPair(node);
 
         return func_node;
     }
     else 
     {
-        if (*s == 'l' && *(s + 1) == 'n')
+        if (*input_buffer == 'l' && *(input_buffer + 1) == 'n')
         {
             struct Pnode* func_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
 
-            s+= 2;
+            input_buffer+= 2;
 
             func_node->value = 'F';
             func_node->type  = FUNCTION_NAME;
@@ -466,21 +466,21 @@ struct Pnode* get_math_F(struct Pnode* node)
 
             func_node->left->value  = 'l';
             func_node->left->type   = FUNCTION_MATH;
-            func_node->right        =  getP(node); 
+            func_node->right        =  getPair(node); 
 
             return func_node;
         }
         else
         {
-            return getV(node);
+            return getVar(node);
         }
     }
 }
 
 
-struct Pnode* getV(struct Pnode* node)
+struct Pnode* getVar(struct Pnode* node)
 {
-    if ( *s < '0' || '9' < *s && *s != '$' && *s != '^')
+    if ( *input_buffer < '0' || '9' < *input_buffer && *input_buffer != '$' && *input_buffer != '^')
     {
 
         struct Pnode* new_node = (struct Pnode*)calloc(1, sizeof(struct Pnode));
@@ -488,9 +488,9 @@ struct Pnode* getV(struct Pnode* node)
         new_node->left   = nullptr;
         new_node->right  = nullptr;
         new_node->type   = VARIABLE;
-        new_node->value  = *s;
+        new_node->value  = *input_buffer;
 
-        s++;
+        input_buffer++;
 
         return new_node;
     }
@@ -508,16 +508,16 @@ struct Pnode* getN(struct Pnode* node)
 
     int val = 0;
 
-    const char* old = s;
+    const char* old = input_buffer;
 
-    while ('0' <= *s && *s <= '9')
+    while ('0' <= *input_buffer && *input_buffer <= '9')
     {
-        val = val * 10 + (*s - '0');
+        val = val * 10 + (*input_buffer - '0');
 
-        s++;
+        input_buffer++;
     }
 
-    if (old == s) 
+    if (old == input_buffer) 
     {   
         SYNTAX_ERROR;
     }

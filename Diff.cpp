@@ -4,8 +4,8 @@
 #include ".\Diff.h"
 #include ".\recursive_descent.h"
 
-char* s; 
-struct Pnode* dump = nullptr;
+char* input_buffer; 
+
 
 int main()
 {
@@ -18,26 +18,26 @@ int main()
     }
 
     size_t file_size = find_file_size(in);
+    input_buffer = fill_text(in, file_size);
 
-    s = (char*)calloc(file_size + 1, sizeof(char));
-
-    s = fill_text(in, file_size);
-
-    printf("\n%s\n", s);
+    printf("\n%s\n", input_buffer);
 
     struct Ptree tree = {};
-
     ptree_construct(&tree);
 
-    tree.start_node = getG(tree.start_node);
+    struct Ptree old_tree = {};
+    ptree_construct(&old_tree);
+
+    tree.start_node = getLast(tree.start_node);
+
+    copy_pnode(&(old_tree.start_node), tree.start_node);
 
     diff_cases(tree.start_node);
     
-    dump = tree.start_node;
-
     yes_i_am_simp(tree.start_node);
 
     graph(tree.start_node);
+    tex_dump(old_tree.start_node, tree.start_node);
 
     return 0;
 }
