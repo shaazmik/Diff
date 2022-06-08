@@ -26,5 +26,8 @@ ___Equation___: 3*sin(5*x)$
 
 ___Result in Tex___: 
 
+![Img alt](https://github.com/shaazmik/Differentiator/blob/main/Tex.png)
 
 ___Graph___:
+
+![Img alt](https://github.com/shaazmik/Differentiator/blob/main/graph_1.png)
